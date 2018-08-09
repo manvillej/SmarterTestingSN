@@ -124,3 +124,5 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/update_sets/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'update_sets')
+
+LOGIN_REDIRECT_URL = 'home'

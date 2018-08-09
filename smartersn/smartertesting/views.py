@@ -1,19 +1,148 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import View
+from django.template import loader
+from django.http import HttpResponse
 from django.db import IntegrityError
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 import xmltodict
 import json
 
-from .forms import UploadFileForm, ObjectTestRelationshipForm
-from .models import UpdateSet, SNObjectType, SNObject, SNTestObjectRelation, Upload, ObjectUploadRelation
+from .forms import UploadFileForm, ObjectTestRelationshipForm, UserForm
+from .models import UpdateSet, SNObjectType, SNObject, SNTest, SNTestObjectRelation, Upload, ObjectUploadRelation
+from .SNIntegration import SNInstance
 
-class ObjectTestRelationFormView(View):
+
+@login_required
+def uploads(request):
+    """returns a list view of of uploads"""
+    template = loader.get_template("smartertesting/uploads.html")
+    context = {
+        "uploads":Upload.objects.all(),
+    }
+
+    # update tests from SN
+    dev = SNInstance()
+    dev.get_tests()
+
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def upload_details(request, upload_id):
+    """returns a details view of a upload and a list view of related tests and objects"""
+    template = loader.get_template("smartertesting/upload_details.html")
+
+    # update tests from SN
+    dev = SNInstance()
+    dev.get_tests()
+
+    upload = Upload.objects.get(id=upload_id)
+    sn_objects = SNObject.objects.all()
+    tests = SNTest.objects.all()
+
+    object_relations = ObjectUploadRelation.objects.all().filter(upload=upload)
+    sn_objects = {relation.sn_object for relation in object_relations}
+
+    relations = SNTestObjectRelation.objects.all().filter(sn_object__in=sn_objects)
+    tests = {relation.test for relation in relations}
+
+    context = {
+        "upload":upload,
+        "sn_objects":sn_objects,
+        "tests":tests,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def sn_objects(request):
+    """returns a list view of sn objects"""
+    template = loader.get_template("smartertesting/sn_objects.html")
+    context = {
+        "sn_objects":SNObject.objects.all(),
+    }
+
+    # update tests from SN
+    dev = SNInstance()
+    dev.get_tests()
+
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def sn_object_details(request, object_id):
+    """returns a detail view of an sn object and its related tests"""
+    # update tests from SN
+    dev = SNInstance()
+    dev.get_tests()
+
+    template = loader.get_template("smartertesting/sn_object_details.html")
+
+    sn_object = SNObject.objects.get(id=object_id)
+
+    relations = SNTestObjectRelation.objects.all().filter(sn_object=object_id)
+    tests = {relation.test for relation in relations}
+
+    context = {
+        "sn_object":sn_object,
+        "tests":tests,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def sn_tests(request):
+    """returns a list view of tests"""
+
+    # update tests from SN
+    dev = SNInstance()
+    dev.get_tests()
+
+    template = loader.get_template("smartertesting/sn_tests.html")
+    context = {
+        "tests":SNTest.objects.all(),
+    }
+    return HttpResponse(template.render(context, request))
+
+@login_required
+def sn_test_details(request, test_id):
+    """returns a detail view of a test and a list of its related objects"""
+
+    # update tests from SN
+    dev = SNInstance()
+    dev.get_tests()
+
+    template = loader.get_template("smartertesting/sn_test_details.html")
+
+    test = SNTest.objects.get(id=test_id)
+
+    relations = SNTestObjectRelation.objects.all().filter(test=test_id)
+    sn_objects = {relation.sn_object for relation in relations}
+
+    context = {
+        "test":test,
+        "sn_objects":sn_objects,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+
+class ObjectTestRelationFormView(LoginRequiredMixin, View):
+    """meant for adding tests to an object"""
     form_class = ObjectTestRelationshipForm
     template_name = "smartertesting/upload.html"
 
     def get(self, request):
         """"""
+        # update tests from SN
+        dev = SNInstance()
+        dev.get_tests()
+
         form = self.form_class(None)
         return render(request, self.template_name, {'form': form})
 
@@ -37,7 +166,8 @@ class ObjectTestRelationFormView(View):
         return render(request, self.template_name, {'form': self.form_class(None)})
 
 
-class UploadFormView(View):
+class UploadFormView(LoginRequiredMixin, View):
+    """form for uploading update sets into application"""
     form_class = UploadFileForm
     template_name = "smartertesting/upload.html"
 
@@ -54,7 +184,6 @@ class UploadFormView(View):
         if(form.is_valid()):
 
             xml_file = request.FILES['file']
-            title = form.cleaned_data['title']
 
 
             remote_update_set = xmltodict.parse(xml_file)
@@ -65,7 +194,8 @@ class UploadFormView(View):
             update_set_name = remote_update_set["unload"]["sys_remote_update_set"]["name"]
             update_set_id = remote_update_set["unload"]["sys_remote_update_set"]["sys_id"]
             description = remote_update_set["unload"]["sys_remote_update_set"]["description"]
-            #print(description)
+
+            # create upload to log objects against
             upload = Upload(
                 update_set_name=update_set_name,
                 update_set_id=update_set_id,
@@ -134,3 +264,45 @@ class UploadFormView(View):
 
         return render(request, self.template_name, {'form': form})
 
+class UserFormView(View):
+    """"""
+    # TODO: UserFormView class docstring
+    form_class = UserForm
+    template_name = "smartertesting/registration_form.html"
+
+    def get(self, request):
+        """display a blank form"""
+        # TODO: UserFormView.get docstring
+        form = self.form_class(None)
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        """Process form data"""
+        # TODO: UserFormView.post docstring
+        form = self.form_class(request.POST)
+
+        if(form.is_valid()):
+            user = form.save(commit=False)
+
+            # cleaned normalized data
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            email = form.cleaned_data['email']
+
+            user.username = username
+            user.email = email
+
+            # hash the password
+            user.set_password(password)
+            user.save()
+
+
+            # returns user object if credentials are correct
+            user = authenticate(username=username, password=password)
+
+            if user is not None:
+                 if user.is_active:
+                     login(request, user)
+                     return redirect('index')
+
+        return render(request, self.template_name, {'form': form})

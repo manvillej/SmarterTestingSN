@@ -1,8 +1,8 @@
 from django import forms
 from .models import SNTest, SNObject
+from django.contrib.auth.models import User
 
 class UploadFileForm(forms.Form):
-    title = forms.CharField(max_length=50)
     file = forms.FileField()
 
 
@@ -13,3 +13,11 @@ class ObjectTestRelationshipForm(forms.Form):
             queryset=SNTest.objects.all(),)
 
     relationship = forms.CharField(max_length=400,  widget=forms.Textarea,)
+
+class UserForm(forms.ModelForm):
+    # TODO: User form
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']

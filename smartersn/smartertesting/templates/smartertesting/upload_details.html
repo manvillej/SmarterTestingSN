@@ -1,0 +1,25 @@
+{% extends 'smartertesting/list_content.html' %}
+
+{% block title %}Uploads{% endblock %}
+
+{% block content %}
+    <h1>Uploads</h1>
+    {% if error_message %}
+    	<p><strong>
+    		{{error_message}}
+    	</strong></p>
+    {% endif %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Upload: {{upload.update_set_name}}</h5>
+            <p class="card-text">Description: {{upload.description}}<br> Update set id: {{upload.update_set_id}}</p>
+            <div class="list-group list-group-flush">
+                {% for upload in uploads %}
+                    {% include 'smartertesting/upload_item.html' %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% include 'smartertesting/related_objects.html' %}
+    {% include 'smartertesting/related_tests.html' %}
+{% endblock %}

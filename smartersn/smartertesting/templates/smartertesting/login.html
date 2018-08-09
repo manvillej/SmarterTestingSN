@@ -1,9 +1,9 @@
-{% extends 'smartertesting/base.html' %}
+{% extends 'smartertesting/list_content.html' %}
 
-{% block title %}Smarter Testing{% endblock %}
+{% block title %}Login{% endblock %}
 
-{% block main_section %}
-    <h1>Upload</h1>
+{% block content %}
+    <h1>Login</h1>
     {% if error_message %}
     	<p><strong>
     		{{error_message}}
@@ -11,8 +11,8 @@
     {% endif %}
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Upload</h5>
-            <form role="form" action="" method="post" enctype="multipart/form-data">
+            <h5 class="card-title">Login</h5>
+            <form role="form" action="" method="post">
                 {% csrf_token %}
                 {{ form.as_p }}
                 <div class="form-group">

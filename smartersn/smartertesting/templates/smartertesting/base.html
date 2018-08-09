@@ -7,45 +7,110 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <!-- font awesome icons -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>{% block title %}My amazing site{% endblock %}</title>
+    <title>{% block title %}Smarter Testing{% endblock %}</title>
 </head>
 
 <body>
     <div id="directory">
         {% block navigation %}
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="/">Title</a>
+            <a class="navbar-brand" href="/">Smarter Testing</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
+                    {% if user.is_staff %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Always</span></a>
+                        <a class="nav-link" href="{% url 'test_relation' %}">Add Test Relationship</a>
                     </li>
-                    <!-- if user.is_staff -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Staff only</a>
+                        <a class="nav-link" href="{% url 'uploads' %}">Uploads</span></a>
                     </li>
-                    <!-- endif -->
-                    <!-- if user.is_authenticated -->
+                    {% endif %}
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Authenticated</a>
+                        <a class="nav-link" href="{% url 'sn_tests' %}">Tests</a>
                     </li>
-                    <!-- else  -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Not Authenticated</a>
+                        <a class="nav-link" href="{% url 'sn_objects' %}">ServiceNow Objects</a>
                     </li>
-                    <!-- endif  -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
         {% endblock %}
         {% block directory %}
         <div class="jumbotron">
-            <h1 class="display-4">Jumbotron</h1>
+            <h1 class="display-4">Smarter Testing</h1>
             <hr class="my-4">
             <p>
+                This project is an experiment on improving the testing capabilities of a platform called ServiceNow.
+                <a href="https://www.servicenow.com/">ServiceNow</a> is a Platform as a service that is used to host a specific set of applications for the purpose of delivering IT services.
+                ServiceNow is an extremely data driven application with records, forms, server side code, client side code, and code libraries represented as records in tables.
+                Despite this highly segmented parts, testing is a very blunt instrument. Tests are generally user tests and grouped into test suites.
+                This may be suitable for user acceptance testing, but I believe there is a better way.
+                <br>
+                <br>
+                By creating a mapping between specific objects and specific tests, this tool is able to identify exactly what tests should be run by which objects have been impacted.
+                Right now, the tool is limited to just direct relationships between an object and a test.
+                In the future, Objects should be able to be related to other objects.
+                This will allow a change to an object will pull tests for objects that were impacted by the original object.
+                <br>
+                <br>
+                Generally, when a company is using ServiceNow, they have three environments or instances of ServiceNow: a Development, Test, and Production environment.
+                Changes are moved through update sets which are just XML files. I learned through this project that their XML files are very complicated.
+                <br>
+                <br>
+                Once I converted the xml to json, I identified 7 different formats for the first layer of keys. When I investigated just one of those, the second layer has 12 different formats.
+                The XMl files generally has 5 layers of keys. I also discovered that while the xmltodict translated most of the file, the payload of an individual update was a string in an xml format which also had to be converted to json.
+                <br>
+                <br>
+                My tool only handles one path at this moment which is:
+                <ol>
+                    <li>["unload"]["sys_update_xml"] -> returns a list of dicts, must be a list of dicts</li>
+                    <li>["payload"] -> returns xml string which is translated into a dict</li>
+                    <li>["record_update"]["@table"] -> must have @table key or it is skipped, return table acted on</li>
+                    <li>["Type"] -> return type of object created</li>
+                </ol>
+                This current iteration has several limitations that I would feel needs to be addressed before anyone should rely on it
+                <ul>
+                    <li>No security around XML upload</li>
+                    <li>Not able link objects</li>
+                    <li>Not able to decode/handle every possible type of update in an update set</li>
+                    <li>create users inactive until admin activates them. Admin should be notified by email</li>
+                </ul>
+                <br>
+                There are several feature I would also like to add
+                <ul>
+                    <li>Store the XML files and allow them to be retreived/downloaded</li>
+                    <li>Enable javascript code to be analyzed when pulled from servicenow instance</li>
+                    <li>allow multiple update sets to be analyzed together and detect collisions</li>
+                    <li>automatically create test suite from the tests found in an upload</li>
+                </ul>
+                <br>
+                This application requires a few environment variables to run and will throw a runtime error if it does not find them
+                <ul>
+                    <li>"SN_INSTANCE" - instance name of the servicenow.</li>
+                    <li>"SN_USERNAME" - username of the user for interacting with that instance</li>
+                    <li>"SN_PASSWORD" - password for interacting with that instance</li>
+                </ul>
+                    Some notes
+                <ul>
+                    <li>Only staff can upload records, look at upload, and add relationships.</li>
+                    <li>logged in users can see SNObject and tests and see the tests/object that affect them</li>
+                    <li>"SN_PASSWORD" - password for interacting with that instance</li>
+                </ul>
             </p>
         </div>
         {% endblock %}

@@ -1,0 +1,11 @@
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Related Tests</h5>
+        <p class="card-text"><br>Tests that should be run if a change impacts this object</p>
+        <div class="list-group list-group-flush">
+            {% for test in tests %}
+                {% include 'smartertesting/sn_test_item.html' %}
+            {% endfor %}
+        </div>
+    </div>
+</div>

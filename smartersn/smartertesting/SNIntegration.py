@@ -129,12 +129,12 @@ class SNInstance(object):
             name = test["name"]
             description = test["description"]
             try:
-                sn_test = SNTests.objects.get(sys_id=sys_id)
+                sn_test = SNTest.objects.get(sys_id=sys_id)
                 sn_test.name = name
                 sn_test.description = description
                 sn_test.save()
-            except SNTests.DoesNotExist:
-                sn_test = SNTests(sys_id=sys_id, name=name, description=description)
+            except SNTest.DoesNotExist:
+                sn_test = SNTest(sys_id=sys_id, name=name, description=description)
                 sn_test.save()
 
 

@@ -1,0 +1,24 @@
+{% extends 'smartertesting/list_content.html' %}
+
+{% block title %}ServiceNow Object{% endblock %}
+
+{% block content %}
+    <h1>ServiceNow Object</h1>
+    {% if error_message %}
+    	<p><strong>
+    		{{error_message}}
+    	</strong></p>
+    {% endif %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">ServiceNow Object: {{sn_object.name}}</h5>
+            <p class="card-text">{{sn_object}}<br>Object: {{sn_object.sys_id}}</p>
+            <div class="list-group list-group-flush">
+                {% for upload in uploads %}
+                    {% include 'smartertesting/upload_item.html' %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% include 'smartertesting/related_tests.html' %}
+{% endblock %}

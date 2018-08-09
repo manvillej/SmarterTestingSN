@@ -1,0 +1,11 @@
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Related Objects</h5>
+        <p class="card-text"><br> Objects affected by the upload</p>
+        <div class="list-group list-group-flush">
+            {% for sn_object in sn_objects %}
+                {% include 'smartertesting/sn_object_item.html' %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
