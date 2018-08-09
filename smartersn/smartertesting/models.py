@@ -9,6 +9,15 @@ class UpdateSet(models.Model):
     def __str__(self):
         return f'UpdateSet: {self.name}'
 
+class Upload(models.Model):
+    update_set_name =  models.CharField(max_length=80)
+    update_set_id = models.CharField(max_length=32)
+    description = models.CharField(max_length=4000, blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.update_set_name}'
+
+
 class SNObjectType(models.Model):
     """this class defines the SN object type, some examples are Business rules, script includes, client scripts, etc."""
     name = models.CharField(max_length=128, unique=True)
@@ -38,3 +47,39 @@ class SNTest(models.Model):
 
     def __str__(self):
         return f'Test: {self.name}'
+
+class SNTestObjectRelation(models.Model):
+    test =  models.ForeignKey(
+        SNTest,
+        on_delete=models.CASCADE,
+        related_name="related_objects",)
+
+    sn_object =   models.ForeignKey(
+        SNObject,
+        on_delete=models.CASCADE,
+        related_name="related_tests",)
+
+    description = models.CharField(max_length=400)
+
+    class Meta:
+        unique_together = ('test', 'sn_object')
+
+    def __str__(self):
+        return f'{self.test} - {self.sn_object}'
+
+class ObjectUploadRelation(models.Model):
+    upload =  models.ForeignKey(
+        Upload,
+        on_delete=models.CASCADE,
+        related_name="updates",)
+
+    sn_object =   models.ForeignKey(
+        SNObject,
+        on_delete=models.CASCADE,
+        related_name="uploads",)
+
+    class Meta:
+        unique_together = ('upload', 'sn_object')
+
+    def __str__(self):
+        return f'{self.upload} - {self.sn_object}'
