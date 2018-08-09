@@ -1,0 +1,24 @@
+{% extends 'smartertesting/base.html' %}
+
+{% block title %}Upload{% endblock %}
+
+{% block main_section %}
+    <h1>Upload</h1>
+    {% if error_message %}
+    	<p><strong>
+    		{{error_message}}
+    	</strong></p>
+    {% endif %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Upload</h5>
+            <form role="form" action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

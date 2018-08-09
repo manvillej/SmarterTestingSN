@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2017-06-18 00:56:01">
+<sys_remote_update_set action="INSERT_OR_UPDATE">
+<application display_value="Global">global</application>
+<application_name>Global</application_name>
+<application_scope>global</application_scope>
+<application_version/>
+<collisions/>
+<commit_date/>
+<deleted/>
+<description/>
+<inserted/>
+<name>Slack Inbound REST</name>
+<origin_sys_id/>
+<release_date/>
+<remote_sys_id>56cf65ebdb533200544370adbf961952</remote_sys_id>
+<state>loaded</state>
+<summary/>
+<sys_class_name>sys_remote_update_set</sys_class_name>
+<sys_created_by>admin</sys_created_by>
+<sys_created_on>2017-06-18 00:56:00</sys_created_on>
+<sys_id>cad4b52fdb533200544370adbf96197f</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>admin</sys_updated_by>
+<sys_updated_on>2017-06-18 00:56:00</sys_updated_on>
+<update_set display_value=""/>
+<update_source display_value=""/>
+<updated/>
+</sys_remote_update_set>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>sys_processor_ac4279ebdb533200544370adbf9619a5</name>
+<payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update table="sys_processor"&gt;&lt;sys_processor action="INSERT_OR_UPDATE"&gt;&lt;active&gt;true&lt;/active&gt;&lt;class_name/&gt;&lt;description&gt;integrating ServiceNow &amp;amp; Slack&lt;/description&gt;&lt;interactive&gt;false&lt;/interactive&gt;&lt;name&gt;Slack Slash Command Integration&lt;/name&gt;&lt;parameters/&gt;&lt;params_endpoint/&gt;&lt;path&gt;slack_slash&lt;/path&gt;&lt;path_endpoint/&gt;&lt;require_csrf&gt;false&lt;/require_csrf&gt;&lt;roles/&gt;&lt;script&gt;&lt;![CDATA[(function process(g_request, g_response, g_processor) {
+
+	gs.log("slack method string: "+g_request.getMethod());
+	gs.log("slack query string: " + g_request.getQueryString());
+
+	var urlParamList = g_request.getParameterNames();
+	var paramMsg = ""; //we're going to log parameter log here
+	while(urlParamList.hasMoreElements()){
+		var param = urlParamList.nextElement();
+		var value = g_request.getParameter(param);
+		gs.log("slack Parameter: ["+param+"] has a value of: "+value+"\n");
+	}
+
+	var urlheaderList = g_request.getHeaderNames();
+	var headerMsg = ""; //we're going to log Header log here
+	while(urlheaderList.hasMoreElements()){
+		var header = urlheaderList.nextElement();
+		var headerValue = g_request.getHeader(header);
+		gs.log("slack Header: ["+header+"] has a value of: "+headerValue+"\n");
+	}
+	
+	// Add your code here
+	g_response.setStatus(200);
+
+})(g_request, g_response, g_processor);]]&gt;&lt;/script&gt;&lt;sys_class_name&gt;sys_processor&lt;/sys_class_name&gt;&lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2017-06-18 00:45:40&lt;/sys_created_on&gt;&lt;sys_customer_update&gt;true&lt;/sys_customer_update&gt;&lt;sys_id&gt;ac4279ebdb533200544370adbf9619a5&lt;/sys_id&gt;&lt;sys_mod_count&gt;1&lt;/sys_mod_count&gt;&lt;sys_name&gt;Slack Slash Command Integration&lt;/sys_name&gt;&lt;sys_package display_value="Global" source="global"&gt;global&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_replace_on_upgrade&gt;false&lt;/sys_replace_on_upgrade&gt;&lt;sys_scope display_value="Global"&gt;global&lt;/sys_scope&gt;&lt;sys_update_name&gt;sys_processor_ac4279ebdb533200544370adbf9619a5&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;admin&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2017-06-18 00:46:37&lt;/sys_updated_on&gt;&lt;type&gt;script&lt;/type&gt;&lt;/sys_processor&gt;&lt;/record_update&gt;</payload>
+<remote_update_set display_value="Slack Inbound REST">cad4b52fdb533200544370adbf96197f</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>admin</sys_created_by>
+<sys_created_on>2017-06-18 00:56:00</sys_created_on>
+<sys_id>4ed4b52fdb533200544370adbf96197f</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>admin</sys_updated_by>
+<sys_updated_on>2017-06-18 00:56:00</sys_updated_on>
+<table/>
+<target_name>Slack Slash Command Integration</target_name>
+<type>Processor</type>
+<update_domain>global</update_domain>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>sys_public_86433debdb533200544370adbf961936</name>
+<payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_public"><sys_public action="INSERT_OR_UPDATE"><active>true</active><page>slack_slash</page><sys_class_name>sys_public</sys_class_name><sys_created_by>admin</sys_created_by><sys_created_on>2017-06-18 00:49:21</sys_created_on><sys_customer_update>true</sys_customer_update><sys_id>86433debdb533200544370adbf961936</sys_id><sys_mod_count>0</sys_mod_count><sys_name>slack_slash</sys_name><sys_package display_value="Global" source="global">global</sys_package><sys_policy/><sys_replace_on_upgrade>false</sys_replace_on_upgrade><sys_scope display_value="Global">global</sys_scope><sys_update_name>sys_public_86433debdb533200544370adbf961936</sys_update_name><sys_updated_by>admin</sys_updated_by><sys_updated_on>2017-06-18 00:49:21</sys_updated_on></sys_public></record_update>]]></payload>
+<remote_update_set display_value="Slack Inbound REST">cad4b52fdb533200544370adbf96197f</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>admin</sys_created_by>
+<sys_created_on>2017-06-18 00:56:00</sys_created_on>
+<sys_id>8ed4b52fdb533200544370adbf96197f</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>admin</sys_updated_by>
+<sys_updated_on>2017-06-18 00:56:00</sys_updated_on>
+<table/>
+<target_name>slack_slash</target_name>
+<type>Public Pages</type>
+<update_domain>global</update_domain>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+</unload>

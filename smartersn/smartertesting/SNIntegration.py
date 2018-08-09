@@ -20,6 +20,9 @@ import xmltodict
 import requests
 from requests.exceptions import HTTPError
 import os
+from datetime import datetime
+
+from .models import SNTest
 
 
 class SNInstance(object):
@@ -29,7 +32,9 @@ class SNInstance(object):
         self.session = self.get_session(**kwargs)
         self.instance = self.get_instance(**kwargs)
         self.headers = {"Content-Type":"application/json","Accept":"application/json"}
+        self.last_run = datetime(2000,1,1,0,0)
 
+        # current test suite
         self.current_suite = ""
 
     def get_instance(self, **kwargs):
@@ -45,6 +50,7 @@ class SNInstance(object):
 
         raise RuntimeError(f'Environment Variable not found: {env_variable}')
 
+
     def get_session(self, **kwargs):
         """"""
         session = kwargs.pop("session", False)
@@ -54,6 +60,7 @@ class SNInstance(object):
         session = requests.Session()
         session.auth = self.get_auth()
         return session
+
 
     def get_auth(self):
         """"""
@@ -68,6 +75,7 @@ class SNInstance(object):
             raise RuntimeError(f'Environment Variable not found: {env_variable}')
 
         return (username, password)
+
 
     def get_records(self, table, encoded_query):
         """
@@ -97,11 +105,37 @@ class SNInstance(object):
 
         raise HTTPError(response)
 
-
-    def get_tests(self, encoded_query):
+    def get_tests(self):
         """"""
         table = "sys_atf_test"
-        return self.get_records(table, encoded_query)
+
+        date_format = '%Y-%m-%d'
+        time_format = '%H:%M:%S'
+        last_run_date = self.last_run.strftime(date_format)
+        last_run_time = self.last_run.strftime(time_format)
+
+
+        # format for the encoded query 'sys_updated_on>javascript:gs.dateGenerate('2018-08-01','00:00:00')'
+        encoded_query = f'sys_updated_on>javascript:gs.dateGenerate(\'{last_run_date}\',\'{last_run_time}\')'
+
+        response = self.get_records(table, encoded_query)
+
+        # mark last run before closing
+        self.last_run = datetime.now()
+
+        tests = response["result"]
+        for test in tests:
+            sys_id = test["sys_id"]
+            name = test["name"]
+            description = test["description"]
+            try:
+                sn_test = SNTests.objects.get(sys_id=sys_id)
+                sn_test.name = name
+                sn_test.description = description
+                sn_test.save()
+            except SNTests.DoesNotExist:
+                sn_test = SNTests(sys_id=sys_id, name=name, description=description)
+                sn_test.save()
 
 
     def create_test_suite(self, name, **kwargs):
@@ -125,7 +159,7 @@ class SNInstance(object):
 
 
     def add_test_to_suite(self, test_id, **kwargs):
-        """"""
+        """ adds a test to a test suite in a ServiceNow Instance"""
         # test_id = "052e804c53b0220002c6435723dc34d1"
         # override current suite if a test suite is passed in.
         test_suite = kwargs.pop("test_suite", self.current_suite)
@@ -146,14 +180,10 @@ class SNInstance(object):
 
 
 
-
-
-
 test_paths = [
     'smartertesting/testXML/sys_remote_update_set.xml',
     'smartertesting/testXML/sys_remote_update_set2.xml',
     'smartertesting/testXML/sys_remote_update_set3.xml']
-
 
 
 def get_update_set_dict(filepath):
@@ -171,6 +201,7 @@ def get_objects_from_update_set(dictionary):
         dictionary = dictionary[step]
 
     return dictionary
+
 
 def get_payload_dict_from_object(sn_object):
     """returns the xmlpayload of a sn object as a dictionary object"""
