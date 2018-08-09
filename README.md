@@ -49,4 +49,7 @@ The XMl files generally has 5 layers of keys. I also discovered that while the x
 ## Some notes
 
  * Only staff can upload records, look at upload, and add relationships
- * logged in users can see SNObject and tests and see the tests/object that affect them
+ * logged in users can see SNObject and tests and see the tests/object that affect 
+ 
+ # For CS50 graders
+ I have emailed my grader with some more details on how to test this. It contains password information, so I didn't want to put it here
